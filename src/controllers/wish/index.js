@@ -4,7 +4,7 @@ import { postgresConnection } from "../../database/connection";
 
 export const getWishes = async (req, res) => {
   try {
-    const allWishes = await Wish.findAll();
+    const allWishes = await Wish.findAll({ order: [["createdAt", "DESC"]] });
 
     if (!allWishes) return res.status(200).json(parseMessage("No wishes yet"));
 

@@ -4,7 +4,7 @@ import { parseMessage } from "../../utils/helper";
 
 export const getRsvp = async (req, res) => {
   try {
-    const booking = await Rsvp.findAll();
+    const booking = await Rsvp.findAll({ order: [["createdAt", "DESC"]] });
 
     if (!booking) return res.status(200).json(parseMessage("No booking yet"));
 
