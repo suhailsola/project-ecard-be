@@ -1,15 +1,32 @@
+import { Sequelize } from "sequelize";
 import { postgresConnection } from "../../database/connection";
 import Rsvp from "../../database/model/Rsvp";
 import { parseMessage } from "../../utils/helper";
 
+const groupBy = (array, key) => {
+  return array.reduce((result, currentValue) => {
+    const groupKey = currentValue[key];
+    (result[groupKey] = result[groupKey] || []).push(currentValue);
+    return result;
+  }, {});
+};
+
 export const getRsvp = async (req, res) => {
   try {
-    const booking = await Rsvp.findAll({ order: [["createdAt", "DESC"]] });
+    const booking = await Rsvp.findAll({
+      order: [["createdAt", "DESC"]],
+    });
 
-    if (!booking) return res.status(200).json(parseMessage("No booking yet"));
+    if (!booking.length)
+      return res.status(200).json(parseMessage("No booking yet"));
 
-    res.status(200).json(parseMessage("Here are the bookings", booking));
+    const separatedBooking = groupBy(booking, "kehadiran");
+
+    res
+      .status(200)
+      .json(parseMessage("Here are the bookings", separatedBooking));
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error });
   }
 };
